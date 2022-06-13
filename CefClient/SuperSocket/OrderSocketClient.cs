@@ -11,6 +11,7 @@ namespace CefClient.SuperSocket
 {
     public class OrderSocketClient
     {
+        private bool IsConnectioning = false;
         private AsyncTcpSession client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
         private int port = 8081;
@@ -33,7 +34,7 @@ namespace CefClient.SuperSocket
 
         void client_Error(object sender, ErrorEventArgs e)
         {
-       
+            Connect();
         }
 
         void client_Connected(object sender, EventArgs e)
@@ -82,18 +83,28 @@ namespace CefClient.SuperSocket
         /// </summary>
         public void Connect()
         {
+            if (IsConnectioning) {
+                return;
+            }
+            IsConnectioning = true;
             try
             {
                 client.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
                 while (!client.IsConnected)
                 {
                     Thread.Sleep(3000);
-                    client.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
+                    if (!client.IsConnected)
+                    {
+                        client.Connect(new IPEndPoint(IPAddress.Parse(ip), port));
+                    }
                 }
             }
             catch
             {
 
+            }
+            finally {
+                IsConnectioning = false;
             }
         }
 
