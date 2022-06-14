@@ -89,6 +89,7 @@ namespace CefSharp.CarVideo
         private static void DecodeAudio()
         {
             index = 0;
+            //音频基础时间戳
             time = 1000000000000000;
             while (StaticResource.AudioIsEnd)
             {
@@ -199,28 +200,34 @@ namespace CefSharp.CarVideo
                 {
                     StaticResource.OriginalVideo.TryDequeue(out byte[] temp);
                     Videobody = VideoRtpDecode.Decode(temp);
+                    //检查是否是实时视频，实时视频直接送入播放队列
                     if (StaticResource.VideoType == "vehicleLive")
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         continue;
                     }
                     string info = BitConvert.ByteToBit(Videobody.type);
+                    //判断是否是音频或透传数据，部分设备上传录像时会携带音频包
                     if (info.Substring(0, 4) == "0011"|| info.Substring(0, 4) == "0100")
                     {
                         continue;
                     }
-           
+           //判断是否是原子包
                     if (info.Substring(4, 4) == "0000")
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         prevStamp = DateTime.Now;
                         continue;
                     }
+                    //判断是否是最后一个分包
                     if (info.Substring(4, 4) == "0001")
                     {
+                        //本地当前帧与上一帧接收时间差
                         int timeCount = (DateTime.Now - prevStamp).Milliseconds;
+                        //判断上一帧解码时间+与本地当前帧与上一帧接收时间差是否小于终端上传的与上一帧的时间差
                         if (timeCount+ StaticResource.prevDecodingStartTime < Videobody.Last_F)
                         {
+                            //休眠时间=终端上传的与上一帧时间差-本地当前帧与上一帧接收时间差-上一帧解码用时
                             int time =Videobody.Last_F - timeCount - StaticResource.prevDecodingStartTime;
                             Thread.Sleep((int)Math.Floor((double)time / StaticResource.VideoMultiple));
                         }
