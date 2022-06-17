@@ -2948,6 +2948,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
         "Release"
@@ -2972,6 +2980,14 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.7.2"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.7.2 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.7.2"
+                    }
+                }
             }
         }
     }
@@ -10627,6 +10643,17 @@
             "Property" = "8:ProgramMenuFolder"
                 "Folders"
                 {
+                    "{9EF0B969-E518-4E46-987F-47570745A589}:_3BC2BA4175764E8EACD5506B05AC14E7"
+                    {
+                    "Name" = "8:数字化矿山"
+                    "AlwaysCreate" = "11:FALSE"
+                    "Condition" = "8:"
+                    "Transitive" = "11:FALSE"
+                    "Property" = "8:_240C62EDADA04C3EB03EEE1A5CA2EB57"
+                        "Folders"
+                        {
+                        }
+                    }
                 }
             }
         }
@@ -10775,7 +10802,7 @@
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_C31329AF5F8F447E8AD380B0E80EA3F6"
-            "Folder" = "8:_F7A3A7A1E15A43C991ABB4855B6626FE"
+            "Folder" = "8:_3BC2BA4175764E8EACD5506B05AC14E7"
             "WorkingFolder" = "8:_C38AB76CB20C46ADB45FD9516DC2ABDF"
             "Icon" = "8:_AC9508464AB14C369803F79F873C8430"
             "Feature" = "8:"
@@ -10803,7 +10830,7 @@
             "IconIndex" = "3:0"
             "Transitive" = "11:FALSE"
             "Target" = "8:_028A5284487042AFA931144852199DED"
-            "Folder" = "8:_F7A3A7A1E15A43C991ABB4855B6626FE"
+            "Folder" = "8:_3BC2BA4175764E8EACD5506B05AC14E7"
             "WorkingFolder" = "8:_C38AB76CB20C46ADB45FD9516DC2ABDF"
             "Icon" = "8:_6BFC6A4B28ED4DA2B6151E29147A017F"
             "Feature" = "8:"
