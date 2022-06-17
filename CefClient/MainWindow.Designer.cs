@@ -40,7 +40,7 @@
             this.tabControl1.Controls.Add(this.MainPage);
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-            this.tabControl1.ItemSize = new System.Drawing.Size(130, 20);
+            this.tabControl1.ItemSize = new System.Drawing.Size(150, 20);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(0);
             this.tabControl1.Multiline = true;
@@ -82,7 +82,7 @@
             this.Controls.Add(this.panel1);
             this.Name = "MainWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "数字化矿山平台";
+            this.Text = "数字化矿山综合管理平台";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.tabControl1.ResumeLayout(false);

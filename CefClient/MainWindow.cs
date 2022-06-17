@@ -70,6 +70,12 @@ namespace CefClient
             {
                 Dock = DockStyle.Fill
             };
+
+
+            var jsEventObj = new ObjectRegisterToWeb();
+            browser.JavascriptObjectRepository.Register(name: "jsEventObj", objectToBind:jsEventObj, isAsync: false, options: BindingOptions.DefaultBinder);
+            browser.JavascriptObjectRepository.Settings.LegacyBindingEnabled = true;
+
             this.MainPage.Controls.Add(browser);
             browser.Load(HOMEURL);
             browser.TitleChanged += TitleChanged;
@@ -100,6 +106,9 @@ namespace CefClient
             settings.Locale = "zh-CN"; // 右键菜单默认中文
             settings.AcceptLanguageList = "zh-CN"; // 网站默认中文
             settings.IgnoreCertificateErrors = true;
+
+            CefSharpSettings.SubprocessExitIfParentProcessClosed = true;
+
             settings.LogFile = System.IO.Path.Combine(appDir, "cef_log/" + Guid.NewGuid().ToString() + ".txt");
             //settings.LogSeverity = LogSeverity.Verbose;
             if (!Cef.Initialize(settings))
@@ -140,11 +149,16 @@ namespace CefClient
         /// </summary>
         public static void CreateTabItem(string url)
         {
-            if (TabControls.TabCount < 2)
-            {
+
+            for (int i=0;i< TabControls.TabPages.Count;i++) {
+                if (TabControls.TabPages[i].Name== url) {
+                    MessageBox.Show("窗口已经打开！");
+                    return;
+                }
+            }
                 TabPage tpage = new TabPage
                 {
-                    Name = "NewPage"
+                    Name = url
                 };
                 TabControls.Controls.Add(tpage);
                 TabControls.SelectTab(TabControls.TabCount - 1);
@@ -157,7 +171,7 @@ namespace CefClient
                 temp.LifeSpanHandler = new LifeSpanHandler();
                 temp.KeyboardHandler = new KeyboardHandler();
                 temp.JsDialogHandler = new JsDialogHandler();
-            }
+            
         }
 
         /// <summary>
