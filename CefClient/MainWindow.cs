@@ -95,7 +95,7 @@ namespace CefClient
                  settings = new CefSettings();
             } 
             catch{            
-                MessageBox.Show("致命错误");
+                MessageBox.Show("致命错误", "信息提示");
                 Application.Exit();
                 return;
             }
@@ -152,7 +152,7 @@ namespace CefClient
 
             for (int i=0;i< TabControls.TabPages.Count;i++) {
                 if (TabControls.TabPages[i].Name== url) {
-                    MessageBox.Show("窗口已经打开！");
+                    MessageBox.Show("窗口已经打开！", "信息提示");
                     return;
                 }
             }

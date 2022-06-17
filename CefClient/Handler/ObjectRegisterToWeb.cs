@@ -29,7 +29,7 @@ namespace CefSharp
                 process.Start();
             }
             else {
-                MessageBox.Show("未找到外部程序","启动失败");
+                MessageBox.Show("未找到外部程序","信息提示");
             }
         }
     }
