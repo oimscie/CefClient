@@ -101,19 +101,26 @@ namespace CefClient
                 //MessageBox.Show("PlayM4_OpenStream" + iLastErr.ToString());
             }
             //开始解码 Start to play
-            CameraWindow.Picture.Invoke(new Action(() =>
-            {
-                if (PlayCtrl.PlayM4_Play(m_lPort, CameraWindow.Picture.Handle) == false)
+            try {
+                CameraWindow.Picture.Invoke(new Action(() =>
                 {
-                    uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-                    return;
+                    if (PlayCtrl.PlayM4_Play(m_lPort, CameraWindow.Picture.Handle) == false)
+                    {
+                        uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
+                        return;
+                    }
+                    Thread Threads = new Thread(Input)
+                    {
+                        IsBackground = true
+                    };
+                    Threads.Start();
+                }));
+            } catch {
+                if (StaticResource.CameraVideoIsEnd)
+                {
+                    StaticResource.ShowMessage("句柄错误，请关闭后重试");
                 }
-                Thread Threads = new Thread(Input)
-                {
-                    IsBackground = true
-                };
-                Threads.Start();
-            }));
+            }
         }
         public  void Input()
         {
