@@ -66,10 +66,16 @@ namespace CefClient
             switch (StaticResource.VideoType)
             {
                 case "vehicleLive":
-                    StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：网络中断");
+                    if (StaticResource.VideoIsEnd)
+                    {
+                        StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：网络中断");
+                    }
                     break;
                 case "vehiclePlayBack":
-                    StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：录像通道被占用");
+                    if (StaticResource.VideoIsEnd)
+                    {
+                        StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：录像通道被占用");
+                    }       
                     break;
                 default:
                     break;
