@@ -1,4 +1,5 @@
 ﻿using CefClient.CarVideo.ConnectServer;
+using CefClient.OrderMessage;
 using CefClient.SuperSocket;
 using CefSharp;
 using CefSharp.CarVideo;
@@ -16,6 +17,7 @@ namespace CefClient.CarVideo
 {
     public partial class LiveWindow : Form
     {
+        private PacketForm PacketForm;
         public static LiveWindow LiveWindows;
         public delegate void ImageDelegate(Image<Bgr, byte> image);
         private static ImageBox LiveBox;
@@ -28,12 +30,20 @@ namespace CefClient.CarVideo
             LiveWindows = this;
             LiveBox = this.imageBox1;
             audioOpen = this.OpenAudio;
+            PacketForm = new PacketForm();
             MainWindow.VideoWindow = true;
 
         }
         private void button_Click(object sender, EventArgs e)
         {
-            AudioConnect.AudioStart(Encoding.UTF8.GetBytes("audio!" + StaticResource.Sim + "!2!6").Concat(abort).ToArray(),8083);
+            AudioConnect.AudioStart(PacketForm.Audio(new AudioAndVideo() {
+            messageType=OrderMessageType.AudioAndVideo,
+                id="6",
+                datatype="2",
+                datatypes="0",
+                sim= StaticResource.Sim,
+                version1078= StaticResource.Version1078
+            }), 8083);
             OpenAudio.Enabled = false;
             CloseAudio.Enabled = true;
         }

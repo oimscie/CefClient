@@ -12,6 +12,7 @@ using System.Timers;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using CefClient.OrderMessage;
 
 namespace CefClient
 {
@@ -48,10 +49,12 @@ namespace CefClient
         public delegate void Messboxdelegates(string text);
         private static ChromiumWebBrowser temp;
         private OrderSocketClient OrderCoketClient;
+        private PacketForm PacketForm;
         public MainWindow()
         {
             InitializeComponent();
             TabControls = this.tabControl1;
+            PacketForm = new PacketForm();
             HOMEURL = "http://" + ConfigurationManager.AppSettings["ServerIp"];       
             this.Load += Form1_Load;
             pen1 = new Pen(Color.Black, 1.8f);
@@ -119,13 +122,19 @@ namespace CefClient
         }
 
         private void orderSocketInit(object objs) {
-            OrderCoketClient = new OrderSocketClient("$login!" + StaticResource.uuid + "!client$");
+            OrderCoketClient = new OrderSocketClient(PacketForm.ClientLogin(
+                new ClientLogin()
+                {
+                    messageType = OrderMessageType.ClientLogin,
+                    uuid = StaticResource.uuid,
+                    type = "client"
+                }));
         }
 
         private void heart(object objs) {
             System.Timers.Timer timer = new System.Timers.Timer();
             timer.Elapsed += new ElapsedEventHandler((obj, eventArg) => {
-                OrderCoketClient.Send(Encoding.UTF8.GetBytes("$heart$"));
+                OrderCoketClient.Send(PacketForm.ClientHeart(new ClientHeart() {messageType=OrderMessageType.ClientHeart}));
             });
             timer.Interval = 5000;
             timer.Enabled = true;

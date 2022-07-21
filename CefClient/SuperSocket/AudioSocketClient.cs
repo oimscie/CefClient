@@ -17,11 +17,11 @@ namespace CefClient
         private EasyClient<PackageInfo> client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
         private int ports;
-        private byte[] infos;
-        public async void ConnectServer(int port,byte[] info)
+        private byte[] orderByte;
+        public async void ConnectServer(int port,byte[] buffer)
         {
             ports = port;
-            infos = info;
+            orderByte = buffer;
             client = new EasyClient<PackageInfo>
             {
                 ReceiveBufferSize =1024*10,
@@ -49,7 +49,7 @@ namespace CefClient
 
         private void OnClientConnected(object sender, EventArgs e)
         {
-            Send(infos);
+            Send(orderByte);
         }
 
         private void OnClientClosed(object sender, EventArgs e)

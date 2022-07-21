@@ -13,13 +13,13 @@ namespace CefClient.CarVideo.ConnectServer
     public static class AudioConnect
     {
         public static AudioSocketClient AudioSocket;
-        public static void AudioStart(byte[] info, int port) {
+        public static void AudioStart(byte[] buffer, int port) {
             StaticResource.AudioReset();
             StaticResource.AudioIsEnd = true;
             AudioPlay.AudioPaly();
             ProcessData.AudioProcessDataStart();
             AudioRecoder.StartRecording();
-            AudioConnectServer(info, port);
+            AudioConnectServer(buffer, port);
         }
         public static void AudioStop()
         {
@@ -31,10 +31,10 @@ namespace CefClient.CarVideo.ConnectServer
             if (StaticResource.VideoType== "Live") { LiveWindow.audioOpen.Enabled = true; }         
         }
 
-        private static void AudioConnectServer(byte[] info,int port)
+        private static void AudioConnectServer(byte[] buffer, int port)
         {
             AudioSocket = new AudioSocketClient();
-            AudioSocket.ConnectServer(port,info);
+            AudioSocket.ConnectServer(port, buffer);
         }
 
     }

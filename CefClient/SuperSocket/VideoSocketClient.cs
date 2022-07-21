@@ -1,4 +1,5 @@
 ﻿using CefClient.CarVideo;
+using CefClient.OrderMessage;
 using CefClient.SuperSocket;
 using CefSharp;
 using CefSharp.CarVideo;
@@ -17,10 +18,10 @@ namespace CefClient
 
         private EasyClient<PackageInfo> client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
-        private int ports;
+        private PacketForm PacketForm;
         public async void ConnectServer(int port)
         {
-            ports = port;
+            PacketForm = new PacketForm();
             client = new EasyClient<PackageInfo>
             {
                 ReceiveBufferSize =1024*10,
@@ -31,7 +32,7 @@ namespace CefClient
             client.NewPackageReceived += OnPackageReceived;
             client.Error += OnClientError;
             client.Closed += OnClientClosed;
-            var connected = await client.ConnectAsync(new IPEndPoint(IPAddress.Parse(ip), ports));
+            var connected = await client.ConnectAsync(new IPEndPoint(IPAddress.Parse(ip), port));
             if (!connected)
             {
                 StaticResource.ShowMessage("连接失败：原因（1）服务器离线");
@@ -50,11 +51,29 @@ namespace CefClient
         {
             switch (StaticResource.VideoType)
             {
-                case "vehicleLive":
-                    Send(Encoding.UTF8.GetBytes("$video!" + StaticResource.Sim + "!1!1$"));
+                case OrderMessageType.AudioAndVideo:
+                    Send(PacketForm.Video(new AudioAndVideo()
+                    {
+                        messageType = OrderMessageType.AudioAndVideo,
+                        id = "1",
+                        datatype = "1",
+                        datatypes = "0",
+                        sim = StaticResource.Sim,
+                        version1078 = StaticResource.Version1078
+                    }));
                     break;
-                case "vehiclePlayBack":
-                    Send(Encoding.UTF8.GetBytes("$hisVideo!" + StaticResource.Sim + "!2!" + PlayBack.StartTimes.Value.ToString() + "!" + PlayBack.StopTime.Value.ToString() + "!1$"));
+                case OrderMessageType.HisVideoAndAudio:
+                    Send(PacketForm.HisVideo(new HisVideoAndAudio() {
+                    messageType= OrderMessageType.HisVideoAndAudio,
+                    id="1",
+                        datatype="2",
+                        ReviewType="0",
+                        FastOrSlow = "0",
+                        StartTime= PlayBack.StartTimes.Value.ToString(),
+                        OverTime= PlayBack.StopTime.Value.ToString(),
+                        sim= StaticResource.Sim,
+                        version1078= StaticResource.Version1078
+                    }));
                     break;
                 default:
                     break;
@@ -65,13 +84,13 @@ namespace CefClient
         {
             switch (StaticResource.VideoType)
             {
-                case "vehicleLive":
+                case OrderMessageType.AudioAndVideo:
                     if (StaticResource.VideoIsEnd)
                     {
                         StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：网络中断");
                     }
                     break;
-                case "vehiclePlayBack":
+                case OrderMessageType.HisVideoAndAudio:
                     if (StaticResource.VideoIsEnd)
                     {
                         StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：录像通道被占用");

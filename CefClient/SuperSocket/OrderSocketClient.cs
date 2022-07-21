@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading;
 using CefSharp;
 using CefClient.Camera;
+using CefClient.OrderMessage;
+
 namespace CefClient.SuperSocket
 {
     public class OrderSocketClient
@@ -15,11 +17,12 @@ namespace CefClient.SuperSocket
         private AsyncTcpSession client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
         private int port = 8081;
-        private string info;
-        private byte[] data;
-        public OrderSocketClient(string infos)
+        private byte[] loginBuffer;
+        private OrderMessageDecode decode;
+        public OrderSocketClient(byte[] buffer)
         {
-            info = infos;
+            decode = new OrderMessageDecode();
+            loginBuffer = buffer;
             client = new AsyncTcpSession();
             // 连接断开事件
             client.Closed += client_Closed;
@@ -39,7 +42,7 @@ namespace CefClient.SuperSocket
 
         void client_Connected(object sender, EventArgs e)
         {
-            Send(Encoding.UTF8.GetBytes(info));
+            Send(loginBuffer);
         }
 
         void client_DataReceived(object sender, DataEventArgs e)
@@ -47,22 +50,25 @@ namespace CefClient.SuperSocket
             if (StaticResource.VideoWindowState)
             {
                 StaticResource.VideoWindowState = false;
-                data = new byte[e.Data.Length];
-                Buffer.BlockCopy(e.Data, 0, data, 0, e.Data.Length);
-                string[] info = Encoding.UTF8.GetString(data).Split('!');
-                switch (info[0])
+                byte[] buffer = new byte[e.Data.Length];
+                Buffer.BlockCopy(e.Data, 0, buffer, 0, e.Data.Length);
+                switch (decode.GetMessageHead(buffer))
                 {
-                    case "vehicleLive":
-                        StaticResource.VideoType = "vehicleLive";
-                        StaticResource.Sim = info[1];
+                    case OrderMessageType.AudioAndVideo:
+
+                        StaticResource.VideoType = OrderMessageType.AudioAndVideo;
+                        AudioAndVideo video = decode.AudioAndVideo(buffer);
+                        StaticResource.Sim = video.sim;
                         break;
-                    case "vehiclePlayBack":
-                        StaticResource.VideoType = "vehiclePlayBack";
-                        StaticResource.Sim = info[1];
+                    case OrderMessageType.HisVideoAndAudio:
+                        StaticResource.VideoType = OrderMessageType.HisVideoAndAudio;
+                        HisVideoAndAudio hisVideo = decode.HisVideoAndAudio(buffer);
+                        StaticResource.Sim = hisVideo.sim;
                         break;
-                    case "monitorOpen":
-                        StaticResource.VideoType = "monitorOpen";
-                        StaticResource.CameraInfo = data;
+                    case OrderMessageType.MonitorOpen:
+                        StaticResource.VideoType = OrderMessageType.MonitorOpen;
+                        MonitorOpen open = decode.MonitorOpen(buffer);
+                        StaticResource.CameraInfo = buffer;
                         break;
                 }
                 new Thread(CreatVidoe).Start();
@@ -127,15 +133,15 @@ namespace CefClient.SuperSocket
         {
             switch (StaticResource.VideoType)
             {
-                case "vehicleLive":
+                case OrderMessageType.AudioAndVideo:
                     StaticResource.Live = new LiveWindow();
                     StaticResource.Live.ShowDialog();
                     break;
-                case "vehiclePlayBack":
+                case OrderMessageType.HisVideoAndAudio:
                     StaticResource.PlayBack = new PlayBack();
                     StaticResource.PlayBack.ShowDialog();
                     break;
-                case "monitorOpen":
+                case OrderMessageType.MonitorOpen:
                     StaticResource.Camera = new CameraWindow();
                     StaticResource.Camera.ShowDialog();
                     break;

@@ -267,6 +267,10 @@
     <Compile Include="CarVideo\RTP\RtpDecode.cs" />
     <Compile Include="CarVideo\RTP\RtpEncode.cs" />
     <Compile Include="LogHelper.cs" />
+    <Compile Include="OrderMessage\OrderMessageType.cs" />
+    <Compile Include="OrderMessage\OrderMessageBody.cs" />
+    <Compile Include="OrderMessage\OrderMessageDecode.cs" />
+    <Compile Include="OrderMessage\PacketForm.cs" />
     <Compile Include="StaticResource.cs" />
     <Compile Include="Handler\JsDialogHandle.cs" />
     <Compile Include="MainWindow.cs">

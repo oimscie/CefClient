@@ -24,6 +24,10 @@ namespace CefSharp
         /// </summary>
         public static string Sim;
         /// <summary>
+        /// 终端1078版本
+        /// </summary>
+        public static string Version1078;
+        /// <summary>
         /// 视频类型
         /// </summary>
         public static string VideoType;
@@ -66,7 +70,7 @@ namespace CefSharp
         /// </summary>
         public static ConcurrentQueue<ValueTuple<IntPtr, uint>> video;
         /// <summary>
-        /// 监控视频终止状态
+        /// 监控信息
         /// </summary>
         public static byte[] CameraInfo;
         /// <summary>
