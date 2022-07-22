@@ -1,6 +1,7 @@
 ﻿using CefClient;
 using CefClient.Camera;
 using CefClient.CarVideo;
+using CefClient.OrderMessage;
 using Jt808Library.JT808PacketBody;
 using System;
 using System.Collections.Concurrent;
@@ -112,13 +113,13 @@ namespace CefSharp
         public static void ShowMessage(string text) {
             switch (VideoType)
             {
-                case "vehicleLive":
+                case OrderMessageType.AudioAndVideo:
                     LiveMessShow(text);
                     break;
-                case "vehiclePlayBack":
+                case OrderMessageType.HisVideoAndAudio:
                     PlayBackMessShow(text);
                     break;
-                case "monitorOpen":
+                case OrderMessageType.MonitorOpen:
                     CameraMessShow(text);
                     break;
             }

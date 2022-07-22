@@ -1,4 +1,5 @@
-﻿using NAudio.Wave;
+﻿using CefClient.OrderMessage;
+using NAudio.Wave;
 using System;
 using System.Threading;
 
@@ -36,7 +37,7 @@ namespace CefSharp.CarVideo.Naudio
         /// </summary>
         public static void StartRecording()
         {
-            if (StaticResource.VideoType == "vehicleLive") {
+            if (StaticResource.VideoType == OrderMessageType.AudioAndVideo) {
                 Thread thread = new Thread(RecordingInit)
                 {
                     IsBackground = true

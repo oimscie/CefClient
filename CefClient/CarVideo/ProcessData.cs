@@ -1,6 +1,7 @@
 ﻿using CefClient;
 using CefClient.CarVideo;
 using CefClient.CarVideo.ConnectServer;
+using CefClient.OrderMessage;
 using CefClient.SuperSocket;
 using CefSharp.CarVideo.Naudio;
 using Jt808Library.JT808PacketBody;
@@ -74,7 +75,7 @@ namespace CefSharp.CarVideo
                 IsBackground = true
             };
             thread4.Start();
-            if (StaticResource.VideoType == "vehicleLive")
+            if (StaticResource.VideoType == OrderMessageType.AudioAndVideo)
             {
                 Thread thread5 = new Thread(DecodeAudio)
                 {
@@ -201,7 +202,7 @@ namespace CefSharp.CarVideo
                     StaticResource.OriginalVideo.TryDequeue(out byte[] temp);
                     Videobody = VideoRtpDecode.Decode(temp);
                     //检查是否是实时视频，实时视频直接送入播放队列
-                    if (StaticResource.VideoType == "vehicleLive")
+                    if (StaticResource.VideoType ==OrderMessageType.AudioAndVideo)
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         continue;

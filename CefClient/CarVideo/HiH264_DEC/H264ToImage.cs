@@ -1,5 +1,6 @@
 ﻿using CefClient;
 using CefClient.CarVideo;
+using CefClient.OrderMessage;
 using CefSharp.CarVideo.HiH264_DEC;
 using Emgu.CV;
 using Emgu.CV.Structure;
@@ -96,13 +97,13 @@ namespace CefSharp.CarVideo
         {
             switch (StaticResource.VideoType)
             {
-                case "vehicleLive":
+                case OrderMessageType.AudioAndVideo:
                     Width = 1280;
                     hight = 720;
                     LivePic = new LiveWindow.ImageDelegate(LiveWindow.LivePicChange);
                     image = new Image<Bgr, byte>((int)Width, (int)hight);
                     break;
-                case "vehiclePlayBack":
+                case OrderMessageType.HisVideoAndAudio:
                     Width = 1280;
                     hight = 720;
                     PlayBackPic = new PlayBack.ImageDelegate(PlayBack.PlayBackPicChange);
@@ -200,10 +201,10 @@ namespace CefSharp.CarVideo
         {
             switch (StaticResource.VideoType)
             {
-                case "vehicleLive":
+                case OrderMessageType.AudioAndVideo:
                     LivePic(image);
                     break;
-                case "vehiclePlayBack":
+                case OrderMessageType.HisVideoAndAudio:
                     PlayBackPic(image);
                     break;
             }

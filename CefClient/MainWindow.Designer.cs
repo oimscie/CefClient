@@ -31,7 +31,9 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.MainPage = new System.Windows.Forms.TabPage();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.button1 = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
+            this.MainPage.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,6 +59,7 @@
             // MainPage
             // 
             this.MainPage.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+            this.MainPage.Controls.Add(this.button1);
             this.MainPage.Location = new System.Drawing.Point(4, 24);
             this.MainPage.Margin = new System.Windows.Forms.Padding(0);
             this.MainPage.Name = "MainPage";
@@ -74,6 +77,16 @@
             this.panel1.Size = new System.Drawing.Size(848, 451);
             this.panel1.TabIndex = 3;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(743, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "button1";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -86,6 +99,7 @@
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainWindow_FormClosing);
             this.tabControl1.ResumeLayout(false);
+            this.MainPage.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -95,6 +109,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.TabPage MainPage;
+        private System.Windows.Forms.Button button1;
     }
 }
 
