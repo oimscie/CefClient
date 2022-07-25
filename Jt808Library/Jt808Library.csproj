@@ -134,6 +134,7 @@
     <Compile Include="Providers\IPacketProvider.cs" />
     <Compile Include="Providers\PacketProvider.cs" />
     <Compile Include="Structures\Comprehensive.cs" />
+    <Compile Include="Structures\equipVersion.cs" />
     <Compile Include="Structures\PacketCommand.cs" />
     <Compile Include="Structures\PacketMessage.cs" />
     <Compile Include="Utils\BitConvert.cs" />

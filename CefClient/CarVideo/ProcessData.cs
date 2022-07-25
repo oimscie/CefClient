@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using static Jt808Library.Structures.EquipVersion;
 
 namespace CefSharp.CarVideo
 {
@@ -101,9 +102,18 @@ namespace CefSharp.CarVideo
                     try
                     {
                         PCM = AudioByte.Concat(AudioByte2).ToArray();
+                        byte[] temp;
                         for (int i = 0; i < 5; i++)
                         {
-                            G711A = new byte[324];
+                            if (StaticResource.Version1078 == Version_1078.Ver_1078_2019)
+                            {
+                                G711A = new byte[328];
+                                temp = Extension.ToBCD(StaticResource.Sim);
+                            }
+                            else {
+                                G711A = new byte[324];
+                                temp = Extension.ToBCD(StaticResource.Sim.Substring(8,12));
+                            }
                             G711A = his.Concat(Encode(PCM.Skip(i * 640).Take(640).ToArray(), 0, 640)).ToArray();
                             byte[] RtpBuffer = RtpEncode.Encode(new RTPBody()
                             {
@@ -111,7 +121,7 @@ namespace CefSharp.CarVideo
                                 Vpxc = 129,
                                 MPT = 134,
                                 index = index,
-                                hSimNumber = Extension.ToBCD(StaticResource.Sim),
+                                hSimNumber = temp,
                                 chanle = 6,
                                 type = 51,
                                 time = split(time),

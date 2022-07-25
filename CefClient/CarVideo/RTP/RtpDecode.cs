@@ -1,6 +1,7 @@
 ﻿using Jt808Library.JT808PacketBody;
 using Jt808Library.Utils;
 using System;
+using static Jt808Library.Structures.EquipVersion;
 
 namespace CefSharp.CarVideo
 {
@@ -18,14 +19,26 @@ namespace CefSharp.CarVideo
                 item.V_P_X_CC = msgBody[indexOffset];
                 item.M_PT = msgBody[indexOffset += 1];
                 item.num = msgBody.ToUInt16(indexOffset += 1);
-                item.SIM = msgBody.Copy(indexOffset += 2, 6);
-                item.ID = msgBody[indexOffset += 6];
+                //兼容粤标10位
+                if (StaticResource .Version1078==Version_1078.Ver_1078_2019)
+                {
+                    item.SIM = msgBody.Copy(indexOffset += 2, 10);
+                    item.ID = msgBody[indexOffset += 10];
+                }
+                else
+                {
+                    byte[] temp = new byte[10];
+                    Buffer.BlockCopy(msgBody, indexOffset += 2, temp, 4, 6);
+                    item.SIM = temp;
+                    item.ID = msgBody[indexOffset += 6];
+                }
                 item.type = msgBody[indexOffset += 1];
                 item.Time = msgBody.Copy(indexOffset += 1, 8);
-                if (BitConvert.ByteToBit(item.type).Substring(0, 4) == "0011")
+                if ((byte)(item.type>>4) == 0b0011)
                 {
                     //音频
                     item.length = msgBody.ToUInt16(indexOffset += 8);
+
                     item.data = msgBody.Copy(indexOffset + 2, item.length);
                 }
                 else
@@ -34,14 +47,7 @@ namespace CefSharp.CarVideo
                     item.Last_I_F = msgBody.ToUInt16(indexOffset += 8);
                     item.Last_F = msgBody.ToUInt16(indexOffset += 2);
                     item.length = msgBody.ToUInt16(indexOffset += 2);
-
-                    if (msgBody.Length - item.length == 30 || msgBody.Length - item.length == 34)
-                    {
-                        item.data = msgBody.Copy(indexOffset + 2, item.length);
-                    }
-                    else {
-                        item.data = nullPacket;
-                    }
+                    item.data = msgBody.Copy(indexOffset + 2, item.length);
                 }
                 return item;
             }
