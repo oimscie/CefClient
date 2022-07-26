@@ -24,7 +24,7 @@ namespace CefClient
             PacketForm = new PacketForm();
             client = new EasyClient<PackageInfo>
             {
-                ReceiveBufferSize =1024*10,
+                ReceiveBufferSize = 1024 * 10,
                 NoDelay = true
             };
             client.Initialize(new RtpReceiveFilter());
@@ -41,7 +41,7 @@ namespace CefClient
 
         private void OnPackageReceived(object sender, PackageEventArgs<PackageInfo> e)
         {
-            if (e.Package.Data.Length >30)
+            if (e.Package.Data.Length > 30)
             {
                 StaticResource.OriginalVideo.Enqueue(e.Package.Data);
             }
@@ -63,16 +63,18 @@ namespace CefClient
                     }));
                     break;
                 case OrderMessageType.HisVideoAndAudio:
-                    Send(PacketForm.HisVideo(new HisVideoAndAudio() {
-                    messageType= OrderMessageType.HisVideoAndAudio,
-                    id="1",
-                        datatype="2",
-                        ReviewType="0",
+                    Send(PacketForm.HisVideo(new HisVideoAndAudio()
+                    {
+                        messageType = OrderMessageType.HisVideoAndAudio,
+                        id = "1",
+                        datatype = "2",
+                        ReviewType = "0",
                         FastOrSlow = "0",
-                        StartTime= PlayBack.StartTimes.Value.ToString(),
-                        OverTime= PlayBack.StopTime.Value.ToString(),
-                        sim= StaticResource.Sim,
-                        version1078= StaticResource.Version1078
+                        datatypes = "0",
+                        StartTime = PlayBack.StartTimes.Value.ToString(),
+                        OverTime = PlayBack.StopTime.Value.ToString(),
+                        sim = StaticResource.Sim,
+                        version1078 = StaticResource.Version1078
                     }));
                     break;
                 default:
@@ -94,18 +96,18 @@ namespace CefClient
                     if (StaticResource.VideoIsEnd)
                     {
                         StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：录像通道被占用");
-                    }       
+                    }
                     break;
                 default:
                     break;
-            }   
+            }
         }
 
         private void OnClientError(object sender, ErrorEventArgs e)
         {
             if (StaticResource.VideoIsEnd)
             {
-                  StaticResource.ShowMessage("信号中断，关闭后重试..");
+                StaticResource.ShowMessage("信号中断，关闭后重试..");
             }
         }
 

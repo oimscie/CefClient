@@ -303,19 +303,5 @@ namespace CefClient
         {
             MessageBox.Show(info);
         }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            StaticResource.VideoType = OrderMessageType.AudioAndVideo;
-
-            StaticResource.Sim = "00000000013304521781";
-            StaticResource.Version1078 = "0";
-            new Thread(CreatVidoe).Start();
-            void CreatVidoe() {
-                StaticResource.Live = new LiveWindow();
-                StaticResource.Live.ShowDialog();
-            }
-           
-        }
     }
 }
