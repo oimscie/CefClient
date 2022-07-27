@@ -217,21 +217,20 @@ namespace CefSharp.CarVideo
                         StaticResource.H264.Enqueue(Videobody.data);
                         continue;
                     }
-                    string info = BitConvert.ByteToBit(Videobody.type);
                     //判断是否是音频或透传数据，部分设备上传录像时会携带音频包
-                    if (info.Substring(0, 4) == "0011"|| info.Substring(0, 4) == "0100")
+                    if (Videobody.type >> 4 ==0b00000011|| Videobody.type == 0b00000100)
                     {
                         continue;
                     }
-           //判断是否是原子包
-                    if (info.Substring(4, 4) == "0000")
+                    //判断是否是原子包
+                    if ((byte)(Videobody.type<<4) == 0b0)
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         prevStamp = DateTime.Now;
                         continue;
                     }
                     //判断是否是最后一个分包
-                    if (info.Substring(4, 4) == "0001")
+                    if ((byte)(Videobody.type << 4) == 0b00010000)
                     {
                         //本地当前帧与上一帧接收时间差
                         int timeCount = (DateTime.Now - prevStamp).Milliseconds;
