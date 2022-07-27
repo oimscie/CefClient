@@ -45,6 +45,9 @@ namespace CefClient
             {
                 StaticResource.OriginalVideo.Enqueue(e.Package.Data);
             }
+            else {
+                StaticResource.ShowMessage(Encoding.UTF8.GetString(e.Package.Data,0, e.Package.Data.Length-4));
+            }
         }
 
         private void OnClientConnected(object sender, EventArgs e)
