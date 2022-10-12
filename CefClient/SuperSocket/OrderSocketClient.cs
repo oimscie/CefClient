@@ -19,6 +19,7 @@ namespace CefClient.SuperSocket
         private int port = 8081;
         private byte[] loginBuffer;
         private OrderMessageDecode decode;
+
         public OrderSocketClient(byte[] buffer)
         {
             decode = new OrderMessageDecode();
@@ -35,23 +36,23 @@ namespace CefClient.SuperSocket
             Connect();
         }
 
-        void client_Error(object sender, ErrorEventArgs e)
+        private void client_Error(object sender, ErrorEventArgs e)
         {
             Connect();
         }
 
-        void client_Connected(object sender, EventArgs e)
+        private void client_Connected(object sender, EventArgs e)
         {
             Send(loginBuffer);
         }
 
-        void client_DataReceived(object sender, DataEventArgs e)
+        private void client_DataReceived(object sender, DataEventArgs e)
         {
             if (StaticResource.VideoWindowState)
             {
                 StaticResource.VideoWindowState = false;
-                byte[] buffer = new byte[e.Data.Length];
-                Buffer.BlockCopy(e.Data, 0, buffer, 0, e.Data.Length);
+                byte[] buffer = new byte[e.Length];
+                Buffer.BlockCopy(e.Data, e.Offset, buffer, 0, e.Length);
                 switch (decode.GetMessageHead(buffer))
                 {
                     case OrderMessageType.AudioAndVideo:
@@ -60,11 +61,13 @@ namespace CefClient.SuperSocket
                         AudioAndVideo video = decode.AudioAndVideo(buffer);
                         StaticResource.Sim = video.sim;
                         break;
+
                     case OrderMessageType.HisVideoAndAudio:
                         StaticResource.VideoType = OrderMessageType.HisVideoAndAudio;
                         HisVideoAndAudio hisVideo = decode.HisVideoAndAudio(buffer);
                         StaticResource.Sim = hisVideo.sim;
                         break;
+
                     case OrderMessageType.MonitorOpen:
                         StaticResource.VideoType = OrderMessageType.MonitorOpen;
                         MonitorOpen open = decode.MonitorOpen(buffer);
@@ -79,7 +82,7 @@ namespace CefClient.SuperSocket
             }
         }
 
-        void client_Closed(object sender, EventArgs e)
+        private void client_Closed(object sender, EventArgs e)
         {
             Connect();
         }
@@ -89,7 +92,8 @@ namespace CefClient.SuperSocket
         /// </summary>
         public void Connect()
         {
-            if (IsConnectioning) {
+            if (IsConnectioning)
+            {
                 return;
             }
             IsConnectioning = true;
@@ -107,9 +111,9 @@ namespace CefClient.SuperSocket
             }
             catch
             {
-
             }
-            finally {
+            finally
+            {
                 IsConnectioning = false;
             }
         }
@@ -137,14 +141,17 @@ namespace CefClient.SuperSocket
                     StaticResource.Live = new LiveWindow();
                     StaticResource.Live.ShowDialog();
                     break;
+
                 case OrderMessageType.HisVideoAndAudio:
                     StaticResource.PlayBack = new PlayBack();
                     StaticResource.PlayBack.ShowDialog();
                     break;
+
                 case OrderMessageType.MonitorOpen:
                     StaticResource.Camera = new CameraWindow();
                     StaticResource.Camera.ShowDialog();
                     break;
+
                 default:
                     break;
             }

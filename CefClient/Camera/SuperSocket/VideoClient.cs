@@ -21,13 +21,12 @@ namespace CefClient
         private int m_lPort = 1;
         private EasyClient<PackageInfo> client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
-   
+
         public async void ConnectServer()
         {
             client = new EasyClient<PackageInfo>
             {
-                ReceiveBufferSize =8192,
-              
+                ReceiveBufferSize = 8192,
             };
             client.Initialize(new ReceiveFilter());
             client.Connected += OnClientConnected;
@@ -35,15 +34,17 @@ namespace CefClient
             client.Error += OnClientError;
             client.Closed += OnClientClosed;
             var connected = await client.ConnectAsync(new IPEndPoint(IPAddress.Parse(ip), 8091));
-            if (!connected&& StaticResource.CameraVideoIsEnd)
+            if (!connected && StaticResource.CameraVideoIsEnd)
             {
                 StaticResource.ShowMessage("连接失败：原因（1）服务器离线");
             }
         }
+
         public EasyClient<PackageInfo> GetClient()
         {
             return client;
         }
+
         private void OnPackageReceived(object sender, PackageEventArgs<PackageInfo> e)
         {
             StaticResource.CameraOriginalvideo.Enqueue(e.Package.Data);
@@ -52,19 +53,17 @@ namespace CefClient
         private void OnClientConnected(object sender, EventArgs e)
         {
             new Thread(new Parse().HkPsParse).Start();
-            Send(StaticResource.CameraInfo.Concat(new byte[] { 11,22,33,44}).ToArray());
+            Send(StaticResource.CameraInfo.Concat(new byte[] { 11, 22, 33, 44 }).ToArray());
             new Thread(RealDataCallBack).Start();
         }
 
-
-        public  void RealDataCallBack()
+        public void RealDataCallBack()
         {
-           
             //获取播放句柄 Get the port to play
             if (PlayCtrl.PlayM4_GetPort(ref m_lPort) == false)
             {
                 uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-              //  LogHelper.WriteLog("1错误码" + nLastErr.ToString());
+                LogHelper.WriteLog("1错误码" + nLastErr.ToString());
                 // MessageBox.Show("PlayM4_GetPort" + nLastErr.ToString());
                 return;
             }
@@ -72,7 +71,7 @@ namespace CefClient
             if (PlayCtrl.PlayM4_SetStreamOpenMode(m_lPort, 0) == false)
             {
                 uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-             //   LogHelper.WriteLog("2错误码" + nLastErr.ToString());
+                LogHelper.WriteLog("2错误码" + nLastErr.ToString());
                 // MessageBox.Show("PlayM4_SetStreamOpenMode" + nLastErr.ToString());
                 return;
             }
@@ -82,7 +81,7 @@ namespace CefClient
             if (PlayCtrl.PlayM4_OpenStream(m_lPort, ValueTuple.Item1, ValueTuple.Item2, 1024 * 1024) == false)
             {
                 uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-              //  LogHelper.WriteLog("3错误码" + nLastErr.ToString());
+                LogHelper.WriteLog("3错误码" + nLastErr.ToString());
                 // MessageBox.Show("PlayM4_OpenStream" + nLastErr.ToString());
                 return;
             }
@@ -90,23 +89,25 @@ namespace CefClient
             if (!PlayCtrl.PlayM4_SetDisplayBuf(m_lPort, 15))
             {
                 uint iLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-               // LogHelper.WriteLog("4错误码" + iLastErr.ToString());
+                LogHelper.WriteLog("4错误码" + iLastErr.ToString());
                 // MessageBox.Show("PlayM4_OpenStream" + iLastErr.ToString());
             }
             //设置显示模式 Set the display mode
-            if (!PlayCtrl.PlayM4_SetOverlayMode(m_lPort, 0, 0/* COLORREF(0)*/)) //play off screen 
+            if (!PlayCtrl.PlayM4_SetOverlayMode(m_lPort, 0, 0/* COLORREF(0)*/)) //play off screen
             {
                 uint iLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-              //  LogHelper.WriteLog("5错误码" + iLastErr.ToString());
+                LogHelper.WriteLog("5错误码" + iLastErr.ToString());
                 //MessageBox.Show("PlayM4_OpenStream" + iLastErr.ToString());
             }
             //开始解码 Start to play
-            try {
+            try
+            {
                 CameraWindow.Picture.Invoke(new Action(() =>
                 {
                     if (PlayCtrl.PlayM4_Play(m_lPort, CameraWindow.Picture.Handle) == false)
                     {
                         uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
+                        LogHelper.WriteLog("6错误码" + nLastErr.ToString());
                         return;
                     }
                     Thread Threads = new Thread(Input)
@@ -115,32 +116,36 @@ namespace CefClient
                     };
                     Threads.Start();
                 }));
-            } catch {
+            }
+            catch
+            {
                 if (StaticResource.CameraVideoIsEnd)
                 {
                     StaticResource.ShowMessage("句柄错误，请关闭后重试");
                 }
             }
         }
-        public  void Input()
+
+        public void Input()
         {
             try
             {
-                while (StaticResource.CameraVideoIsEnd&& StaticResource.video.Count<1) {
+                while (StaticResource.CameraVideoIsEnd && StaticResource.video.Count < 1)
+                {
                     Thread.Sleep(1);
                 }
                 CameraWindow.Picture.Image = null;
                 while (StaticResource.CameraVideoIsEnd)
                 {
-                    if (StaticResource.video.Count >0)
+                    if (StaticResource.video.Count > 0)
                     {
                         ValueTuple<IntPtr, uint> ValueTuple = new ValueTuple<IntPtr, uint>();
-                        StaticResource.video.TryDequeue(out  ValueTuple);
+                        StaticResource.video.TryDequeue(out ValueTuple);
                         //送入码流数据进行解码 Input the stream data to decode
                         if (!PlayCtrl.PlayM4_InputData(m_lPort, ValueTuple.Item1, ValueTuple.Item2))
                         {
                             uint nLastErr = PlayCtrl.PlayM4_GetLastError(m_lPort);
-                          //  LogHelper.WriteLog("错误码" + nLastErr.ToString());
+                            LogHelper.WriteLog("错误码" + nLastErr.ToString());
                             //若缓冲区满，则重复送入数据
                             if (nLastErr == 11)
                             {
@@ -149,24 +154,23 @@ namespace CefClient
                             }
                         }
                     }
-                    else {
+                    else
+                    {
                         Thread.Sleep(2);
                     }
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-                LogHelper.WriteLog("错误"+e);
+                LogHelper.WriteLog("错误" + e);
             }
         }
-
-
 
         private void OnClientClosed(object sender, EventArgs e)
         {
             if (StaticResource.CameraVideoIsEnd)
             {
-                 StaticResource.ShowMessage("获取失败，原因（1）：设备离线（2）：登录错误");
+                StaticResource.ShowMessage("获取失败，原因（1）：设备离线（2）：登录错误");
             }
         }
 
@@ -196,6 +200,9 @@ namespace CefClient
         public void Close()
         {
             client.Close();
+            PlayCtrl.PlayM4_Stop(m_lPort);
+            PlayCtrl.PlayM4_CloseStream(m_lPort);
+            PlayCtrl.PlayM4_FreePort(m_lPort);
         }
     }
 }
