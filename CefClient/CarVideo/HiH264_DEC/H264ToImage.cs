@@ -16,7 +16,7 @@ using static CefSharp.CarVideo.HiH264_DEC.HiH264_DECS;
 
 namespace CefSharp.CarVideo
 {
-    class H264ToImage
+    internal class H264ToImage
     {
         private static LiveWindow.ImageDelegate LivePic;
         private static PlayBack.ImageDelegate PlayBackPic;
@@ -26,11 +26,14 @@ namespace CefSharp.CarVideo
         private const int HI_H264DEC_NO_PICTURE = -2;
         private uint Width;
         private uint hight;
+
         /// <summary>
         /// 流解码开始时间
         /// </summary>
         private DateTime decodingStartTime;
+
         #region 解码器相关声明
+
         /// <summary>
         /// 数据的句柄
         /// </summary>
@@ -38,20 +41,26 @@ namespace CefSharp.CarVideo
         /// 这是解码器属性信息
         /// </summary>
         private HiH264_DEC_ATTR_S decAttr;
+
         /// <summary>
         /// 这是解码器输出图像信息
         /// </summary>
         private static HiH264_DEC_FRAME_S _decodeFrame = new HiH264_DEC_FRAME_S();
+
         /// <summary>
         /// 解码器句柄
         /// </summary>
         private IntPtr _decHandle;
+
         private readonly double[,] YUV2RGB_CONVERT_MATRIX = new double[3, 3] { { 1, 0, 1.4022 }, { 1, -0.3456, -0.7145 }, { 1, 1.771, 0 } };
-        //解码结束  
+
+        //解码结束
         [DllImport("hi_h264dec_w.dll", EntryPoint = "Hi264DecCreate", CallingConvention = CallingConvention.Cdecl)]
         private static extern IntPtr Hi264DecCreate(ref HiH264_DEC_ATTR_S pDecAttr);
+
         [DllImport("hi_h264dec_w.dll", EntryPoint = "Hi264DecDestroy", CallingConvention = CallingConvention.Cdecl)]
         private static extern void Hi264DecDestroy(IntPtr hDec);
+
         /// <summary>
         /// 流解码
         /// </summary>
@@ -64,6 +73,7 @@ namespace CefSharp.CarVideo
         /// <returns></returns>
         [DllImport("hi_h264dec_w.dll", EntryPoint = "Hi264DecFrame", CallingConvention = CallingConvention.Cdecl)]
         private static extern int Hi264DecFrame(IntPtr hDec, IntPtr pStream, uint iStreamLen, ulong ullPTS, ref HiH264_DEC_FRAME_S pDecFrame, uint uFlags);
+
         /*  /// <summary>
           /// 完整帧解码
           /// </summary>
@@ -78,9 +88,12 @@ namespace CefSharp.CarVideo
           private static extern int Hi264DecAU(IntPtr hDec, IntPtr pStream, uint iStreamLen, ulong ullPTS, ref HiH264_DEC_FRAME_S pDecFrame, uint uFlags);*/
 
         private static byte[] rgbFrame;
+
         // private readonly int bufferLen = 0x600;
         private Image<Bgr, byte> image;
-        #endregion
+
+        #endregion 解码器相关声明
+
         /// <summary>
         /// 解码器初始化
         /// </summary>
@@ -93,6 +106,7 @@ namespace CefSharp.CarVideo
             };
             thread.Start();
         }
+
         private void Init()
         {
             switch (StaticResource.VideoType)
@@ -103,6 +117,7 @@ namespace CefSharp.CarVideo
                     LivePic = new LiveWindow.ImageDelegate(LiveWindow.LivePicChange);
                     image = new Image<Bgr, byte>((int)Width, (int)hight);
                     break;
+
                 case OrderMessageType.HisVideoAndAudio:
                     Width = 1280;
                     hight = 720;
@@ -128,8 +143,6 @@ namespace CefSharp.CarVideo
             _decHandle = Hi264DecCreate(ref decAttr);
         }
 
-
-
         /// <summary>
         /// 解码流
         /// </summary>
@@ -143,7 +156,7 @@ namespace CefSharp.CarVideo
                 }
                 decodingStartTime = DateTime.Now;
                 StaticResource.H264.TryDequeue(out byte[] tempByte);
-                if ( tempByte == null||tempByte.Length == 0) { continue; }
+                if (tempByte == null || tempByte.Length == 0) { continue; }
                 IntPtr pData = Marshal.AllocHGlobal(tempByte.Length);
                 Marshal.Copy(tempByte, 0, pData, tempByte.Length);
                 int result = Hi264DecFrame(_decHandle, pData, (uint)tempByte.Length, 0, ref _decodeFrame, 0);
@@ -185,13 +198,14 @@ namespace CefSharp.CarVideo
                             ChangePic(image);
                             if (handle.IsAllocated) handle.Free();
                         }
-                    } catch { 
-
+                    }
+                    catch
+                    {
                     }
                     /* 继续解码剩余H.264码流 */
                     result = Hi264DecFrame(_decHandle, IntPtr.Zero, 0, 0, ref _decodeFrame, 0);
                 }
-                StaticResource.prevDecodingStartTime =(DateTime.Now - decodingStartTime).Milliseconds;
+                StaticResource.prevDecodingStartTime = (DateTime.Now - decodingStartTime).Milliseconds;
             }
             /* 销毁解码器 */
             Hi264DecDestroy(_decHandle);
@@ -204,6 +218,7 @@ namespace CefSharp.CarVideo
                 case OrderMessageType.AudioAndVideo:
                     LivePic(image);
                     break;
+
                 case OrderMessageType.HisVideoAndAudio:
                     PlayBackPic(image);
                     break;

@@ -56,16 +56,19 @@ namespace CefClient.SuperSocket
                 switch (decode.GetMessageHead(buffer))
                 {
                     case OrderMessageType.AudioAndVideo:
-
                         StaticResource.VideoType = OrderMessageType.AudioAndVideo;
                         AudioAndVideo video = decode.AudioAndVideo(buffer);
                         StaticResource.Sim = video.sim;
+                        StaticResource.AudioAndVideo = video;
+                        StaticResource.Version1078 = video.version1078;
                         break;
 
                     case OrderMessageType.HisVideoAndAudio:
                         StaticResource.VideoType = OrderMessageType.HisVideoAndAudio;
                         HisVideoAndAudio hisVideo = decode.HisVideoAndAudio(buffer);
+                        StaticResource.HisVideoAndAudio = hisVideo;
                         StaticResource.Sim = hisVideo.sim;
+                        StaticResource.Version1078 = hisVideo.version1078;
                         break;
 
                     case OrderMessageType.MonitorOpen:

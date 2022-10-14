@@ -15,10 +15,10 @@ namespace CefClient
 {
     public class VideoSocketClient
     {
-
         private EasyClient<PackageInfo> client;
         private string ip = ConfigurationManager.AppSettings["orderServer"];
         private PacketForm PacketForm;
+
         public async void ConnectServer(int port)
         {
             PacketForm = new PacketForm();
@@ -45,8 +45,9 @@ namespace CefClient
             {
                 StaticResource.OriginalVideo.Enqueue(e.Package.Data);
             }
-            else {
-                StaticResource.ShowMessage(Encoding.UTF8.GetString(e.Package.Data,0, e.Package.Data.Length-4));
+            else
+            {
+                StaticResource.ShowMessage(Encoding.UTF8.GetString(e.Package.Data, 0, e.Package.Data.Length - 4));
             }
         }
 
@@ -55,31 +56,15 @@ namespace CefClient
             switch (StaticResource.VideoType)
             {
                 case OrderMessageType.AudioAndVideo:
-                    Send(PacketForm.Video(new AudioAndVideo()
-                    {
-                        messageType = OrderMessageType.AudioAndVideo,
-                        id = "1",
-                        datatype = "1",
-                        datatypes = "0",
-                        sim = StaticResource.Sim,
-                        version1078 = StaticResource.Version1078
-                    }));
+                    Send(PacketForm.Video(StaticResource.AudioAndVideo));
                     break;
+
                 case OrderMessageType.HisVideoAndAudio:
-                    Send(PacketForm.HisVideo(new HisVideoAndAudio()
-                    {
-                        messageType = OrderMessageType.HisVideoAndAudio,
-                        id = "1",
-                        datatype = "2",
-                        ReviewType = "0",
-                        FastOrSlow = "0",
-                        datatypes = "0",
-                        StartTime = PlayBack.StartTimes.Value.ToString(),
-                        OverTime = PlayBack.StopTime.Value.ToString(),
-                        sim = StaticResource.Sim,
-                        version1078 = StaticResource.Version1078
-                    }));
+                    StaticResource.HisVideoAndAudio.StartTime = PlayBack.StartTimes.Value.ToString();
+                    StaticResource.HisVideoAndAudio.OverTime = PlayBack.StopTime.Value.ToString();
+                    Send(PacketForm.HisVideo(StaticResource.HisVideoAndAudio));
                     break;
+
                 default:
                     break;
             }
@@ -95,12 +80,14 @@ namespace CefClient
                         StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：网络中断");
                     }
                     break;
+
                 case OrderMessageType.HisVideoAndAudio:
                     if (StaticResource.VideoIsEnd)
                     {
                         StaticResource.ShowMessage("通信终止：可能原因（1）：设备离线（2）：录像通道被占用");
                     }
                     break;
+
                 default:
                     break;
             }
