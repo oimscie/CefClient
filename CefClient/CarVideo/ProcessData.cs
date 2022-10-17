@@ -25,31 +25,39 @@ namespace CefSharp.CarVideo
         /// 包序号
         /// </summary>
         private static ushort index;
+
         /// <summary>
         /// 时间戳
         /// </summary>
         private static long time;
+
         /// <summary>
         /// 上一帧接收时间
         /// </summary>
         private static DateTime prevStamp = new DateTime(1970, 1, 1, 0, 0, 0);
+
         /// <summary>
         /// PCM组
         /// </summary>
         private static byte[] PCM;
+
         private static byte[] G711A;
+
         /// <summary>
         /// 海思头
         /// </summary>
         private static readonly byte[] his = new byte[] { 0, 1, 160, 0 };
+
         /// <summary>
         /// 指令截止符
         /// </summary>
         private static readonly byte[] abort = new byte[] { 11, 22, 33, 44 };
+
         private static RtpPacket Audiobody;
         private static RtpPacket Videobody;
         private static RtpDecode AudioRtpDecode = new RtpDecode();
         private static RtpDecode VideoRtpDecode = new RtpDecode();
+
         /// <summary>
         /// 视频数据处理器启动入口，前置初始化视频解析器，连接到服务器，
         /// </summary>
@@ -61,6 +69,7 @@ namespace CefSharp.CarVideo
             };
             thread1.Start();
         }
+
         /// <summary>
         /// 音频数据处理器启动入口，前置初始化播放器与录音器，连接到服务器
         /// </summary>
@@ -85,6 +94,7 @@ namespace CefSharp.CarVideo
                 thread5.Start();
             }
         }
+
         /// <summary>
         /// 音频RTP组装发送
         /// </summary>
@@ -110,9 +120,10 @@ namespace CefSharp.CarVideo
                                 G711A = new byte[328];
                                 temp = Extension.ToBCD(StaticResource.Sim);
                             }
-                            else {
+                            else
+                            {
                                 G711A = new byte[324];
-                                temp = Extension.ToBCD(StaticResource.Sim.Substring(8,12));
+                                temp = Extension.ToBCD(StaticResource.Sim.Substring(8, 12));
                             }
                             G711A = his.Concat(Encode(PCM.Skip(i * 640).Take(640).ToArray(), 0, 640)).ToArray();
                             byte[] RtpBuffer = RtpEncode.Encode(new RTPBody()
@@ -145,15 +156,14 @@ namespace CefSharp.CarVideo
                             }
                             return list.ToArray();
                         }
-
                     }
                     catch
                     {
                     }
-
                 }
             }
         }
+
         /// <summary>
         /// G711转换PCM加入播放队列
         /// </summary>
@@ -172,7 +182,6 @@ namespace CefSharp.CarVideo
                         AudioPlay.AddDataToBufferedWaveProvider(PCMbuffer, 0, PCMbuffer.Length);
                     }
                     catch { }
-
                 }
                 else
                 {
@@ -180,6 +189,7 @@ namespace CefSharp.CarVideo
                 }
             }
         }
+
         /// <summary>
         /// 处理原始RTP包,分离G711码流
         /// </summary>
@@ -198,8 +208,8 @@ namespace CefSharp.CarVideo
                     Thread.Sleep(1);
                 }
             }
-
         }
+
         /// <summary>
         /// 处理原始RTP包,分离H264码流
         /// </summary>
@@ -212,18 +222,18 @@ namespace CefSharp.CarVideo
                     StaticResource.OriginalVideo.TryDequeue(out byte[] temp);
                     Videobody = VideoRtpDecode.Decode(temp);
                     //检查是否是实时视频，实时视频直接送入播放队列
-                    if (StaticResource.VideoType ==OrderMessageType.AudioAndVideo)
+                    if (StaticResource.VideoType == OrderMessageType.AudioAndVideo)
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         continue;
                     }
                     //判断是否是音频或透传数据，部分设备上传录像时会携带音频包
-                    if (Videobody.type >> 4 ==0b00000011|| Videobody.type == 0b00000100)
+                    if (Videobody.type >> 4 == 0b00000011 || Videobody.type == 0b00000100)
                     {
                         continue;
                     }
                     //判断是否是原子包
-                    if ((byte)(Videobody.type<<4) == 0b0)
+                    if ((byte)(Videobody.type << 4) == 0b0)
                     {
                         StaticResource.H264.Enqueue(Videobody.data);
                         prevStamp = DateTime.Now;
@@ -235,10 +245,10 @@ namespace CefSharp.CarVideo
                         //本地当前帧与上一帧接收时间差
                         int timeCount = (DateTime.Now - prevStamp).Milliseconds;
                         //判断上一帧解码时间+与本地当前帧与上一帧接收时间差是否小于终端上传的与上一帧的时间差
-                        if (timeCount+ StaticResource.prevDecodingStartTime < Videobody.Last_F)
+                        if (timeCount + StaticResource.prevDecodingStartTime < Videobody.Last_F)
                         {
                             //休眠时间=终端上传的与上一帧时间差-本地当前帧与上一帧接收时间差-上一帧解码用时
-                            int time =Videobody.Last_F - timeCount - StaticResource.prevDecodingStartTime;
+                            int time = Videobody.Last_F - timeCount - StaticResource.prevDecodingStartTime;
                             Thread.Sleep((int)Math.Floor((double)time / StaticResource.VideoMultiple));
                         }
                         StaticResource.H264.Enqueue(Videobody.data);

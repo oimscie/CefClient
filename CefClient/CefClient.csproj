@@ -247,6 +247,8 @@
     <Compile Include="Camera\SuperSocket\VideoClient.cs" />
     <Compile Include="CarVideo\ConnectServer\AudioConnect.cs" />
     <Compile Include="CarVideo\ConnectServer\VideoConnect.cs" />
+    <Compile Include="CarVideo\HiH264_DEC\SpsNual.cs" />
+    <Compile Include="CarVideo\HiH264_DEC\SpsDecoder.cs" />
     <Compile Include="CarVideo\PlayBack.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -302,6 +304,7 @@
     <Compile Include="SuperSocket\AudioSocketClient.cs" />
     <Compile Include="SuperSocket\ServerReplyCode.cs" />
     <Compile Include="SuperSocket\VideoSocketClient.cs" />
+    <Compile Include="Utils.cs" />
     <EmbeddedResource Include="Camera\Control.resx">
       <DependentUpon>Control.cs</DependentUpon>
     </EmbeddedResource>
