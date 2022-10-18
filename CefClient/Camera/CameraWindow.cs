@@ -1,10 +1,7 @@
-﻿using CefClient.Camera;
-using CefClient.Camera.ConnectServer;
-using CefSharp;
+﻿using CefSharp;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.IO;
 using System.Windows.Forms;
 
 namespace CefClient.Camera
@@ -14,8 +11,10 @@ namespace CefClient.Camera
         public static PictureBox Picture;
         public static CameraWindow CameraWindows;
         public VideoClient VideoClient;
-        private  CameraControl control;
+        private CameraControl control;
+
         public delegate void Messboxdelegates(string text);
+
         public CameraWindow()
         {
             InitializeComponent();
@@ -42,7 +41,7 @@ namespace CefClient.Camera
 
         private void CameraWindow_Load(object sender, EventArgs e)
         {
-            VideoClient=new VideoClient();
+            VideoClient = new VideoClient();
             VideoClient.ConnectServer();
         }
 
@@ -51,6 +50,7 @@ namespace CefClient.Camera
             control = new CameraControl(VideoClient);
             control.ShowDialog();
         }
+
         /// <summary>
         /// 截图
         /// </summary>
@@ -70,6 +70,7 @@ namespace CefClient.Camera
                 StaticResource.MessShow("截取失败");
             }
         }
+
         /// <summary>
         /// 信息弹出
         /// </summary>

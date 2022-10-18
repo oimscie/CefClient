@@ -36,7 +36,7 @@
             // 
             this.picture.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.picture.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.picture.Image = global::CefClient.Properties.Resources.load;
+            this.picture.Image = global::CefClient.Properties.Resources.monitorError;
             this.picture.Location = new System.Drawing.Point(0, 0);
             this.picture.Name = "picture";
             this.picture.Size = new System.Drawing.Size(1264, 681);

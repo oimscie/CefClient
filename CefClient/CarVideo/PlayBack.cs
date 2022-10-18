@@ -17,9 +17,15 @@ namespace CefClient.CarVideo
         public static PlayBack PlayBacks = null;
         public static DateTimePicker StartTimes;
         public static DateTimePicker StopTime;
-        private static ImageBox playBackBox;
+        public static ImageBox playBackBox;
+        private static bool record = false;
+        private static VideoWriter vw = null;
+        public static Panel recordPanel;
+
         public delegate void ImageDelegate(Image<Bgr, byte> image);
+
         public delegate void Messboxdelegates(string text);
+
         public PlayBack()
         {
             InitializeComponent();
@@ -28,38 +34,62 @@ namespace CefClient.CarVideo
             StartTimes = this.StartTime;
             StopTime = this.OverTime;
             playBackBox = this.imageBox2;
+            playBackBox.BringToFront();
+            recordPanel = this.panel1;
+            recordPanel.SendToBack();
             StaticResource.VideoMultiple = 1;
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            comboBox1.Text = "1";
-            ThreadPool.QueueUserWorkItem(VideoConnect.VideoStart, 8084);
-            //* AudioConnect.AudioStart(Encoding.UTF8.GetBytes("$audio!" + StaticResource.Sim + "!1!" + StartTimes.Value.ToString() + "!" + StopTime.Value.ToString() + "!1$"), 8085);历史音频，需要摄像头能录音*//*
-            PlayBacks.button2.Enabled = true;
-            PlayBacks.button1.Enabled = false;
-            PlayBacks.comboBox1.Enabled = true;
+            if (this.videoPlay.Text == "播放")
+            {
+                comboBox1.Text = "1";
+                ThreadPool.QueueUserWorkItem(VideoConnect.VideoStart, 8084);
+                //* AudioConnect.AudioStart(Encoding.UTF8.GetBytes("$audio!" + StaticResource.Sim + "!1!" + StartTimes.Value.ToString() + "!" + StopTime.Value.ToString() + "!1$"), 8085);历史音频，需要摄像头能录音*//*
+                PlayBacks.comboBox1.Enabled = true;
+                this.videoPlay.Text = "断开";
+            }
+            else
+            {
+                VideoConnect.VideoStop();
+                AudioConnect.AudioStop();
+                PlayBacks.comboBox1.Enabled = false;
+                this.videoPlay.Text = "播放";
+            }
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
-            VideoConnect.VideoStop();
-            AudioConnect.AudioStop();
-            PlayBacks.button1.Enabled = true;
-            PlayBacks.button2.Enabled = false;
-            PlayBacks.comboBox1.Enabled = false;
+            if (this.recordVideo.Text == "录制")
+            {
+                vw = new VideoWriter(Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "/" + (DateTime.Now.ToUniversalTime().Ticks - 621355968000000000) + ".avi", VideoWriter.Fourcc('M', 'P', '4', 'V'), 30, new Size(this.imageBox2.Width, this.imageBox2.Height), true);
+                record = true;
+                this.recordVideo.Text = "终止";
+            }
+            else
+            {
+                record = false;
+                vw.Dispose();
+                this.recordVideo.Text = "录制";
+            }
         }
+
         public static void PlayBackPicChange(Image<Bgr, byte> images)
         {
             try
             {
                 playBackBox.Image = images;
+                if (record && vw != null)
+                {
+                    vw.Write(images.Mat);
+                }
             }
             catch
             {
-
+                record = false;
+                vw.Dispose();
             }
-
         }
 
         private void Form2_FormClosing(object sender, FormClosingEventArgs e)
@@ -74,6 +104,7 @@ namespace CefClient.CarVideo
             MainWindow.VideoWindow = false;
             GC.Collect();
         }
+
         /// <summary>
         /// 信息弹出
         /// </summary>

@@ -3,9 +3,13 @@ using CefClient.CarVideo;
 using CefClient.CarVideo.HiH264_DEC;
 using CefClient.OrderMessage;
 using CefSharp.CarVideo.HiH264_DEC;
+using CefSharp.DevTools.Page;
 using Emgu.CV;
+using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
+using Emgu.CV.UI;
 using Jt808Library.Utils;
+using OpenTK.Graphics.ES20;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -14,8 +18,12 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
+using ZedGraph;
 using static CefSharp.CarVideo.HiH264_DEC.HiH264_DECS;
+using Capture = Emgu.CV.Capture;
 
 namespace CefSharp.CarVideo
 {
@@ -108,16 +116,27 @@ namespace CefSharp.CarVideo
 
         private void Init(SpsNual sps)
         {
+            int MonitorWidth = SystemInformation.PrimaryMonitorSize.Width;
+            int MonitorHeight = SystemInformation.PrimaryMonitorSize.Height;
             switch (StaticResource.VideoType)
             {
                 case OrderMessageType.AudioAndVideo:
                     LivePic = new LiveWindow.ImageDelegate(LiveWindow.LivePicChange);
                     image = new Image<Bgr, byte>((int)Width, (int)hight);
+                    //调整窗体大小
+                    LiveWindow.LiveBox.Size = new Size(Width, hight);
+                    LiveWindow.LiveWindows.ClientSize = new Size(Width, hight + LiveWindow.LivePanel.Height + 2);
+                    LiveWindow.LivePanel.Location = new Point((Width - LiveWindow.LivePanel.Width) / 2, hight + 2);
+                    LiveWindow.LiveWindows.Location = new Point((MonitorWidth - LiveWindow.LiveWindows.Width) / 2, (MonitorHeight - LiveWindow.LiveWindows.Height) / 2);
                     break;
 
                 case OrderMessageType.HisVideoAndAudio:
                     PlayBackPic = new PlayBack.ImageDelegate(PlayBack.PlayBackPicChange);
                     image = new Image<Bgr, byte>((int)Width, (int)hight);
+                    PlayBack.playBackBox.Size = new Size(Width, hight);
+                    PlayBack.PlayBacks.ClientSize = new Size(Width, hight + PlayBack.recordPanel.Height + 2); ;
+                    PlayBack.recordPanel.Location = new Point((Width - PlayBack.recordPanel.Width) / 2, hight + 2);
+                    PlayBack.PlayBacks.Location = new Point((MonitorWidth - PlayBack.PlayBacks.Width) / 2, (MonitorHeight - PlayBack.PlayBacks.Height) / 2);
                     break;
             }
             decAttr = new HiH264_DEC_ATTR_S
@@ -243,6 +262,7 @@ namespace CefSharp.CarVideo
                     Thread.Sleep(2);
                 }
             }
+
             while (StaticResource.VideoIsEnd)
             {
                 if (StaticResource.H264.Count < 1)
@@ -289,7 +309,7 @@ namespace CefSharp.CarVideo
                             GCHandle handle = GCHandle.Alloc(yuvBytes, GCHandleType.Pinned);
                             using (Image<Bgr, byte> yv12 = new Image<Bgr, byte>((int)Width, ((int)hight >> 1) * 3, (int)Width, handle.AddrOfPinnedObject()))
                             {
-                                CvInvoke.CvtColor(yv12, image, Emgu.CV.CvEnum.ColorConversion.Yuv2BgrYv12);
+                                CvInvoke.CvtColor(yv12, image, ColorConversion.Yuv2BgrYv12);
                             }
                             ChangePic(image);
                             if (handle.IsAllocated) handle.Free();
